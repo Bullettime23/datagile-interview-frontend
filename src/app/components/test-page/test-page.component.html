@@ -1,0 +1,34 @@
+<section class="test-page-wrapper" *ngIf="question$ | async as question">
+  <ng-container *ngIf="formGroup$ | async as group" [formGroup]="group">
+    <article>
+      <h3 class="question">{{ question.question }}</h3>
+      <p class="timer">
+        Оставшееся время: <span>{{ (timeLeft$ | async)! | time }}</span>
+      </p>
+    </article>
+    <article class="answers">
+      <label
+        formArrayName="answers"
+        *ngFor="let control of cities.controls; let i = index"
+      >
+        <input type="checkbox" [formControl]="$any(control)" />
+        {{ question.answers[i] }}
+      </label>
+    </article>
+
+    <footer *ngIf="formGroup$ | async as group">
+      <button *ngIf="!(isFirstQuestion$ | async)" (click)="onReturnClick()">
+        Назад</button
+      ><button (click)="onForwardClick()">Вперед</button
+      ><button
+        *ngIf="isLastQuestion$ | async; else submit"
+        (click)="onFinish(question, group)"
+      >
+        Закончить
+      </button>
+      <ng-template #submit>
+        <button (click)="onSubmitClick(question, group)">Ответить</button>
+      </ng-template>
+    </footer>
+  </ng-container>
+</section>
