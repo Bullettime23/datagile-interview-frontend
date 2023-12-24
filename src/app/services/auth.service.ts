@@ -12,6 +12,7 @@ export class AuthService {
   constructor(private api: ApiService) {}
 
   loginById(id: string | null): Observable<boolean> {
+    console.log('Trying to login with id: ', id);
     if (this.isUserLoggedIn) {
       return of(true);
     }

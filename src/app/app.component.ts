@@ -1,7 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FacadeService } from './services/facade.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { BehaviorSubject, EMPTY, first, iif, switchMap, take, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  EMPTY,
+  debounceTime,
+  first,
+  iif,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -14,15 +23,12 @@ export class AppComponent implements OnInit {
   testName$ = this.facade.getTestName();
   isLoaded$ = new BehaviorSubject(false);
 
-  constructor(
-    private facade: FacadeService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  constructor(private facade: FacadeService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.route.queryParamMap
       .pipe(
+        debounceTime(2000),
         switchMap((params: ParamMap) =>
           this.facade.authUser(params.get('id')).pipe(take(1))
         ),
@@ -33,7 +39,14 @@ export class AppComponent implements OnInit {
               first(),
               tap(() => this.isLoaded$.next(true))
             ),
-            EMPTY.pipe(tap({ complete: () => this.facade.accessDenied() }))
+            EMPTY.pipe(
+              tap({
+                complete: () => {
+                  this.facade.accessDenied();
+                  this.isLoaded$.next(true);
+                },
+              })
+            )
           )
         )
       )

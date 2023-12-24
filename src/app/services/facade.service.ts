@@ -48,6 +48,7 @@ export class FacadeService {
   }
 
   accessDenied(): void {
+    console.log('Access denied');
     this.state.stubMessage$.next(
       'Доступ запрещен: обратитесь к администратору'
     );
